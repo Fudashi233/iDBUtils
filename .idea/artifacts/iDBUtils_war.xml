@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="iDBUtils:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="iDBUtils.war">
-      <element id="artifact" artifact-name="iDBUtils:war exploded" />
-    </root>
-  </artifact>
-</component>
