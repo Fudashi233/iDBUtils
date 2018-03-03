@@ -1,3 +1,14 @@
+# maven
+target/
+
+# IDEA
+.idea/
+*.iml
+out/
+
+# MAC
+*.DS_Store
+
 # Compiled class file
 *.class
 
