@@ -2,9 +2,15 @@ package cn.edu.jxau.lang;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Desc:
@@ -26,6 +32,19 @@ import java.sql.SQLException;
  * +-----------+--------------+------+-----+---------+----------------+
  */
 public class Main {
+
+
+    @Test
+    public void test() throws Exception {
+
+        Customer customer = new Customer();
+        Field field = Customer.class.getDeclaredField("id");
+        field.setAccessible(true);
+        field.setInt(customer, 1);
+        //field.set(customer,1);
+        System.out.println(customer.getId0());
+
+    }
 
     @Test
     public void insert() throws SQLException {
@@ -51,5 +70,46 @@ public class Main {
         Object params[] = {2};
         Customer customer = (Customer) qr.query(sql, params, new BeanHandler(Customer.class));
         System.out.println(customer);
+    }
+
+    @Test
+    public void getAll() throws SQLException {
+        QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
+        String sql = "SELECT * FROM t_customer";
+        List list = (List) qr.query(sql, new BeanListHandler(Customer.class));
+        System.out.println(list.size());
+    }
+
+    @Test
+    public void testBatch() throws SQLException {
+        QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
+        String sql = "INSERT INTO t_customer values(NULL, ?, ?, ?, ?, ?)";
+
+        Object params[][] = new Object[10][];
+        for (int i = 0; i < 10; i++) {
+            params[i] = new Object[]{"Fudashi0" + i, "0" + i + "Fudashi", "150123456789", "123@qq.com", "no"};
+        }
+        qr.batch(sql, params);
+    }
+
+    @Test
+    public void testColumnListHandler() throws SQLException {
+        QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
+        String sql = "select * from t_customer";
+        List list = (List) qr.query(sql, new ColumnListHandler("id"));
+        System.out.println(list);
+    }
+
+    @Test
+    public void testMapHandler() throws SQLException {
+        QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
+        String sql = "select * from t_customer";
+
+        List<Map> list = (List) qr.query(sql, new MapListHandler());
+        for (Map<String, Object> map : list) {
+            for (Map.Entry<String, Object> me : map.entrySet()) {
+                System.out.println(me.getKey() + "=" + me.getValue());
+            }
+        }
     }
 }
