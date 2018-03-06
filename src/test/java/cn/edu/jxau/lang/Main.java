@@ -1,16 +1,22 @@
 package cn.edu.jxau.lang;
 
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
-import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.dbutils.handlers.MapHandler;
 import org.junit.Test;
 
-import java.lang.reflect.Field;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Desc:
@@ -35,14 +41,39 @@ public class Main {
 
 
     @Test
-    public void test() throws Exception {
+    public void test() throws SQLException {
 
-        Customer customer = new Customer();
-        Field field = Customer.class.getDeclaredField("id");
-        field.setAccessible(true);
-        field.setInt(customer, 1);
-        //field.set(customer,1);
-        System.out.println(customer.getId0());
+        boolean ret = DbUtils.loadDriver("com.mysql.jdbc.Driver");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8","root","root");
+        System.out.println(connection);
+    }
+
+    @Test
+    public void loadFromXml() {
+        Properties prop = new Properties();
+
+        // add some properties
+        prop.put("Height", "200");
+        prop.put("Width", "15");
+
+        try {
+
+            // create a output and input as a xml file
+            FileOutputStream fos = new FileOutputStream("properties.xml");
+            FileInputStream fis = new FileInputStream("properties.xml");
+
+            // store the properties in the specific xml
+            prop.storeToXML(fos, null);
+
+            // load from the xml that we saved earlier
+            prop.loadFromXML(fis);
+
+            // print the properties list
+            prop.list(System.out);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
     }
 
@@ -105,11 +136,9 @@ public class Main {
         QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
         String sql = "select * from t_customer";
 
-        List<Map> list = (List) qr.query(sql, new MapListHandler());
-        for (Map<String, Object> map : list) {
-            for (Map.Entry<String, Object> me : map.entrySet()) {
-                System.out.println(me.getKey() + "=" + me.getValue());
-            }
+        Map<String, Object> map = (Map) qr.query(sql, new MapHandler());
+        for (Map.Entry<String, Object> me : map.entrySet()) {
+            System.out.println(me.getKey() + "=" + me.getValue());
         }
     }
 }

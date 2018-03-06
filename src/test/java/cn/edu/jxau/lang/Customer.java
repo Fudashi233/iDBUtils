@@ -12,6 +12,10 @@ import lombok.Data;
 @Data
 public class Customer {
 
+    static {
+        System.out.println("static ");
+    }
+
     private Integer id;
     private String name;
     private String contact;
