@@ -1,5 +1,6 @@
 package cn.edu.jxau.lang;
 
+import cn.edu.jxau.dbutils.DBUtils;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
@@ -34,7 +35,7 @@ import java.util.Properties;
  * | contact   | varchar(128) | NO   |     | NULL    |                |
  * | telephone | varchar(128) | NO   |     | NULL    |                |
  * | email     | varchar(128) | NO   |     | NULL    |                |
- * | remark    | varchar(256) | NO   |     | NULL    |                |
+ * | remark    | varcha) | NO   |     | NULL    |                |
  * +-----------+--------------+------+-----+---------+----------------+
  */
 public class Main {
@@ -44,7 +45,7 @@ public class Main {
     public void test() throws SQLException {
 
         boolean ret = DbUtils.loadDriver("com.mysql.jdbc.Driver");
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8","root","root");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8", "root", "root");
         System.out.println(connection);
     }
 
@@ -82,8 +83,12 @@ public class Main {
 
         QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
         String sql = "INSERT INTO t_customer values(NULL, NULL, NULL, NULL, NULL, NULL)";
-        Object[] params = {null, null, null, null, null};
-        qr.update(sql, params);
+        Object[] params = {1, null, null, null, null};
+        try {
+            qr.update(sql, params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -112,15 +117,26 @@ public class Main {
     }
 
     @Test
-    public void testBatch() throws SQLException {
+    public void testBatch() {
         QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
         String sql = "INSERT INTO t_customer values(NULL, ?, ?, ?, ?, ?)";
 
         Object params[][] = new Object[10][];
         for (int i = 0; i < 10; i++) {
-            params[i] = new Object[]{"Fudashi0" + i, "0" + i + "Fudashi", "150123456789", "123@qq.com", "no"};
+            params[i] = new Object[]{null, "0" + i + "Fudashi", "150123456789", "123@qq.com", "no"};
         }
-        qr.batch(sql, params);
+        try {
+            qr.batch(sql, params);
+        } catch (SQLException ex) {
+            System.err.println();
+            System.err.println();
+            System.err.println();
+            while(ex != null) {
+                ex.printStackTrace();
+                System.err.println("-----------------------------------");
+                ex = ex.getNextException();
+            }
+        }
     }
 
     @Test
