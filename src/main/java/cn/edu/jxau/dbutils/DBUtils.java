@@ -1,7 +1,9 @@
 package cn.edu.jxau.dbutils;
 
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.util.Arrays;
 
 /**
  * Desc:
@@ -180,5 +182,50 @@ public class DBUtils {
         } finally {
             pw.close();
         }
+    }
+
+    public static PreparedStatement prepareStatement(Connection conn, String sql) throws SQLException {
+
+        if (sql == null || "".equals(sql.trim())) {
+            throw new IllegalArgumentException("参数异常，sql is null or empty");
+        }
+        return conn.prepareStatement(sql);
+    }
+
+    /**
+     * @param conn
+     * @param sql
+     * @param returnPK 是否返回主键
+     * @return
+     * @throws SQLException
+     */
+    public static PreparedStatement prepareStatement(Connection conn, String sql, boolean returnPK) throws SQLException {
+
+        if (returnPK) {
+            return conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        } else {
+            return conn.prepareStatement(sql);
+        }
+    }
+
+    public static void rethrow(SQLException cause, String sql, Object... params) throws SQLException {
+
+        StringBuilder message = new StringBuilder();
+        message.append(cause == null ? "" : cause);
+        message.append(" Query: ").append(sql).append("\n");
+        message.append(" Parameters: ").
+                append(params == null ? "[]" : Arrays.toString(params)).append("\n");
+
+        SQLException e = new SQLException(message.toString(), cause.getSQLState(), cause.getErrorCode());
+        e.setNextException(cause);
+        throw e;
+    }
+
+    public static Connection getConnection(DataSource dataSource) throws SQLException {
+
+        if (dataSource == null) {
+            throw new IllegalArgumentException("dataSource is null，无法获取 connection");
+        }
+        return dataSource.getConnection();
     }
 }

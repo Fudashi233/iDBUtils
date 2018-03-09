@@ -2,6 +2,7 @@ package cn.edu.jxau.dbutils;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.Arrays;
 
 /**
  * Desc:
@@ -47,38 +48,6 @@ public abstract class AbstractQueryRunner {
         return pmdKnownBroken;
     }
 
-    protected PreparedStatement prepareStatement(Connection conn, String sql) throws SQLException {
-
-        if (sql == null || "".equals(sql.trim())) {
-            throw new IllegalArgumentException("参数异常，sql is null or empty");
-        }
-        return conn.prepareStatement(sql);
-    }
-
-    /**
-     * @param conn
-     * @param sql
-     * @param returnPK 是否返回主键
-     * @return
-     * @throws SQLException
-     */
-    protected PreparedStatement prepareStatement(Connection conn, String sql, boolean returnPK) throws SQLException {
-
-        if (returnPK) {
-            return conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-        } else {
-            return conn.prepareStatement(sql);
-        }
-    }
-
-    protected Connection getConnection() throws SQLException {
-
-        if (dataSource == null) {
-            throw new NullPointerException("dataSource is null，无法获取 connection");
-        }
-        return dataSource.getConnection();
-    }
-
     /**
      * 填充 SQL 语句的参数
      *
@@ -100,14 +69,14 @@ public abstract class AbstractQueryRunner {
 
         if (param == null) {
             int sqlType = Types.VARCHAR;
-            if(!pmdKnownBroken) {
+            if (!pmdKnownBroken) {
                 try {
                     ParameterMetaData pmd = preparedStatement.getParameterMetaData();
                     sqlType = pmd.getParameterType(index);
-                } catch(SQLException e) {
+                } catch (SQLException e) {
                     pmdKnownBroken = true;
                 }
-                preparedStatement.setNull(index,sqlType);
+                preparedStatement.setNull(index, sqlType);
             }
         } else {
             preparedStatement.setObject(index, param);
@@ -131,7 +100,7 @@ public abstract class AbstractQueryRunner {
         try {
             pmd = preparedStatement.getParameterMetaData();
         } catch (SQLException e) {
-            pmdKnownBroken =  true;
+            pmdKnownBroken = true;
         }
         int statementCount = pmd.getParameterCount(); //sql 所需的参数个数
         int parameterCount = params.length; //实际的参数个数
@@ -140,4 +109,33 @@ public abstract class AbstractQueryRunner {
                     statementCount, parameterCount));
         }
     }
+
+    public void fillStatementWithBean(PreparedStatement stmt, Object bean) {
+
+
+    }
+
+    protected ResultSet wrap(ResultSet resultSet) {
+        return resultSet;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
