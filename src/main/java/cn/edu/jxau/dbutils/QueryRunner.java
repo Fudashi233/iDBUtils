@@ -82,7 +82,7 @@ public class QueryRunner extends AbstractQueryRunner {
         if (connection == null) {
             throw new IllegalArgumentException("connection is null");
         }
-        if (sql == null || "".equals(sql.trim())) {
+        if (sql == null || sql.isEmpty()) {
             if (closeConn) {
                 DBUtils.close(connection);
             }

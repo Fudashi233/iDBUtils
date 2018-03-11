@@ -4,6 +4,7 @@ import cn.edu.jxau.lang.JDBCUtils;
 import org.junit.Test;
 
 import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * Desc:
@@ -18,8 +19,8 @@ public class QueryRunnerTest {
     public void insert() throws SQLException {
 
         QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
-        String sql = "INSERT INTO t_customer values(NULL,? ,? ,? ,? ,?)";
-        Object[] params = {"Fudashi03", "Fudashi03", "15083825093", "email xxx", "remark xxx"};
+        String sql = "INSERT INTO t_manuscript values(NULL,NULL,NULL,NULL,NULL,?,NULL,NULL)";
+        Object[] params = {new Date()};
         try {
             qr.update(sql, params);
         } catch (SQLException e) {

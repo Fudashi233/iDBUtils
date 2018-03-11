@@ -186,7 +186,7 @@ public class DBUtils {
 
     public static PreparedStatement prepareStatement(Connection conn, String sql) throws SQLException {
 
-        if (sql == null || "".equals(sql.trim())) {
+        if (sql == null || sql.isEmpty()) {
             throw new IllegalArgumentException("参数异常，sql is null or empty");
         }
         return conn.prepareStatement(sql);

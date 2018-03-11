@@ -2,6 +2,11 @@ package cn.edu.jxau.lang;
 
 import lombok.Data;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+
 /**
  * Desc:
  * ------------------------------------
@@ -12,10 +17,13 @@ import lombok.Data;
 @Data
 public class Customer {
 
+    private int id0;
     private Integer id;
     private String name;
     private String contact;
     private String telephone;
     private String email;
     private String remark;
+    private java.util.Date birthday;
+    private java.util.Date birthday0;
 }

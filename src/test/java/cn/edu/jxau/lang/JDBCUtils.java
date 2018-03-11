@@ -20,7 +20,7 @@ public class JDBCUtils {
     private static final BasicDataSource DATA_SOURCE = new BasicDataSource();
 
     private static final String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
-    private static final String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8";
+    private static final String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
 
