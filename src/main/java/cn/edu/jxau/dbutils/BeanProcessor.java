@@ -78,7 +78,7 @@ public class BeanProcessor {
      *
      * @return
      */
-    protected int[] getColumnToProperty(ResultSetMetaData resultSetMD, PropertyDescriptor[] propDescArr) throws SQLException {
+    private int[] getColumnToProperty(ResultSetMetaData resultSetMD, PropertyDescriptor[] propDescArr) throws SQLException {
 
         int[] columnToProperty = new int[resultSetMD.getColumnCount() + 1];
         Arrays.fill(columnToProperty, PROPERTY_NOT_FOUND);

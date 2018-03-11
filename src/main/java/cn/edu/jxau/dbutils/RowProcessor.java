@@ -14,11 +14,43 @@ import java.util.Map;
  */
 public interface RowProcessor {
 
+    /**
+     * 将一条数据库记录转换成数组
+     *
+     * @param resultSet
+     * @return
+     * @throws SQLException
+     */
     Object[] toArray(ResultSet resultSet) throws SQLException;
 
-    <T> T toBean(ResultSet resultSet) throws SQLException;
+    /**
+     * 将一条数据库记录转换为Bean
+     *
+     * @param resultSet
+     * @param clazz
+     * @param <T>
+     * @return
+     * @throws SQLException
+     */
+    <T> T toBean(ResultSet resultSet, Class<T> clazz) throws SQLException;
 
-    <T> List<T> toBeanList(ResultSet resultSet) throws SQLException;
+    /**
+     * 将多条数据库记录转换为List
+     *
+     * @param resultSet
+     * @param clazz
+     * @param <T>
+     * @return
+     * @throws SQLException
+     */
+    <T> List<T> toBeanList(ResultSet resultSet, Class<T> clazz) throws SQLException;
 
+    /**
+     * 将一条数据库记录转换为Map
+     *
+     * @param resultSet
+     * @return
+     * @throws SQLException
+     */
     Map<String, Object> toMap(ResultSet resultSet) throws SQLException;
 }
