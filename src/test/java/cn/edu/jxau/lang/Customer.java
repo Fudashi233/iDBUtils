@@ -17,7 +17,6 @@ import java.sql.Timestamp;
 @Data
 public class Customer {
 
-    private int id0;
     private Integer id;
     private String name;
     private String contact;

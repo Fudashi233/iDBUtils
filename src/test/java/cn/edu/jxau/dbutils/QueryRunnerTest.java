@@ -1,10 +1,14 @@
 package cn.edu.jxau.dbutils;
 
+import cn.edu.jxau.dbutils.handlers.BeanHandler;
+import cn.edu.jxau.lang.Customer;
 import cn.edu.jxau.lang.JDBCUtils;
 import org.junit.Test;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Desc:
@@ -16,7 +20,7 @@ import java.util.Date;
 public class QueryRunnerTest {
 
     @Test
-    public void insert() throws SQLException {
+    public void update() throws SQLException {
 
         QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
         String sql = "INSERT INTO t_manuscript values(NULL,NULL,NULL,NULL,NULL,?,NULL,NULL)";
@@ -27,4 +31,27 @@ public class QueryRunnerTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void query() throws SQLException {
+
+        QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
+        String sql = "SELECT * FROM t_customer WHERE id = 1";
+        try {
+            Customer customer = qr.query(sql, new BeanHandler<Customer>(Customer.class));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void foo() throws SQLException {
+
+        String str = query(new BeanHandler<String>());
+    }
+
+    public <T> T query(ResultSetHandler<T> handler) throws SQLException {
+        return null;
+    }
+
 }

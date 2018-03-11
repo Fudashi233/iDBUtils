@@ -3,6 +3,7 @@ package cn.edu.jxau.dbutils;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -34,7 +35,7 @@ public class QueryRunner extends AbstractQueryRunner {
     // update
     //--------------------------------------
     public int update(Connection connection, String sql) throws SQLException {
-        return this.update(connection, false, sql, null);
+        return this.update(connection, false, sql);
     }
 
     public int update(Connection connection, String sql, Object... params) throws SQLException {
@@ -42,7 +43,7 @@ public class QueryRunner extends AbstractQueryRunner {
     }
 
     public int update(String sql) throws SQLException {
-        return this.update(DBUtils.getConnection(super.getDataSource()), true, sql, null);
+        return this.update(DBUtils.getConnection(super.getDataSource()), true, sql);
     }
 
     public int update(String sql, Object... params) throws SQLException {
@@ -63,10 +64,11 @@ public class QueryRunner extends AbstractQueryRunner {
     private int update(Connection connection, boolean closeConn, String sql, Object... params) throws SQLException {
 
         check(connection, closeConn, sql);
+        int result = 0;
         try {
             PreparedStatement preStatement = DBUtils.prepareStatement(connection, sql);
             super.fillStatement(preStatement, params);
-            return preStatement.executeUpdate();
+            result = preStatement.executeUpdate();
         } catch (SQLException e) {
             DBUtils.rethrow(e, sql, params);
         } finally {
@@ -74,7 +76,7 @@ public class QueryRunner extends AbstractQueryRunner {
                 DBUtils.close(connection);
             }
         }
-        return -1; //DBUtils.rethrow() 会抛出个异常，不可能会走到这
+        return result;
     }
 
     private void check(Connection connection, boolean closeConn, String sql) throws SQLException {
@@ -94,6 +96,56 @@ public class QueryRunner extends AbstractQueryRunner {
     // query
     //--------------------------------------
 
+    public <T> T query(Connection connection, String sql, ResultSetHandler<T> handler) throws SQLException {
+        return this.query(connection, false, sql, handler);
+    }
+
+    public <T> T query(Connection connection, String sql, ResultSetHandler<T> handler, Object... params) throws SQLException {
+        return this.query(connection, false, sql, handler, params);
+    }
+
+    public <T> T query(String sql, ResultSetHandler<T> handler) throws SQLException {
+        return this.query(DBUtils.getConnection(super.getDataSource()), true, sql, handler);
+    }
+
+    public <T> T query(String sql, ResultSetHandler<T> handler, Object... params) throws SQLException {
+        return this.query(DBUtils.getConnection(super.getDataSource()), true, sql, handler, params);
+    }
+
+    private <T> T query(Connection connection, boolean closeConn, String sql, ResultSetHandler<T> handler, Object... params) throws SQLException {
+
+        check(connection, closeConn, sql);
+        if (handler == null) {
+            if (closeConn) {
+                DBUtils.close(connection);
+            }
+            throw new IllegalArgumentException("handler is null");
+        }
+        PreparedStatement preStatement = null;
+        ResultSet resultSet = null;
+        T result = null;
+        try {
+            preStatement = DBUtils.prepareStatement(connection, sql);
+            super.fillStatement(preStatement, params);
+            resultSet = this.wrap(preStatement.executeQuery());
+            return handler.handle(resultSet);
+        } catch (SQLException e) {
+            DBUtils.rethrow(e, sql, params);
+        } finally {
+            try {
+                DBUtils.close(resultSet);
+            } finally {
+                try {
+                    DBUtils.close(preStatement);
+                } finally {
+                    if (closeConn) {
+                        DBUtils.close(connection);
+                    }
+                }
+            }
+        }
+        return result;
+    }
     //--------------------------------------
     // batch
     //--------------------------------------

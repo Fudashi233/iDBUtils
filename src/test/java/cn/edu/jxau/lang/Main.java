@@ -1,7 +1,5 @@
 package cn.edu.jxau.lang;
 
-import cn.edu.jxau.dbutils.DBUtils;
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
@@ -12,8 +10,6 @@ import org.junit.Test;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -40,13 +36,9 @@ import java.util.Properties;
  */
 public class Main {
 
-
     @Test
     public void test() throws SQLException {
 
-        boolean ret = DbUtils.loadDriver("com.mysql.jdbc.Driver");
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8", "root", "root");
-        System.out.println(connection);
     }
 
     @Test
@@ -104,7 +96,7 @@ public class Main {
         QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
         String sql = "SELECT * FROM t_customer WHERE id = ?";
         Object params[] = {2};
-        Customer customer = (Customer) qr.query(sql, params, new BeanHandler(Customer.class));
+        Customer customer =  (Customer)qr.query(sql, params, new BeanHandler(Customer.class));
         System.out.println(customer);
     }
 
@@ -131,7 +123,7 @@ public class Main {
             System.err.println();
             System.err.println();
             System.err.println();
-            while(ex != null) {
+            while (ex != null) {
                 ex.printStackTrace();
                 System.err.println("-----------------------------------");
                 ex = ex.getNextException();
@@ -143,7 +135,7 @@ public class Main {
     public void testColumnListHandler() throws SQLException {
         QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
         String sql = "select * from t_customer";
-        List list = (List) qr.query(sql, new ColumnListHandler("id"));
+        List<Customer> list = qr.query(sql, new ColumnListHandler<Customer>("id"));
         System.out.println(list);
     }
 
