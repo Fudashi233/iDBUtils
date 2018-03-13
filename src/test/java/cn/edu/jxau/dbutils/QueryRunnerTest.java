@@ -39,19 +39,11 @@ public class QueryRunnerTest {
         String sql = "SELECT * FROM t_customer WHERE id = 1";
         try {
             Customer customer = qr.query(sql, new BeanHandler<Customer>(Customer.class));
+            System.out.println(customer);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    @Test
-    public void foo() throws SQLException {
-
-        String str = query(new BeanHandler<String>());
-    }
-
-    public <T> T query(ResultSetHandler<T> handler) throws SQLException {
-        return null;
-    }
 
 }

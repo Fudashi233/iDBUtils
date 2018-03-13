@@ -2,7 +2,6 @@ package cn.edu.jxau.dbutils;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.Arrays;
 
 /**
  * Desc:
@@ -56,9 +55,6 @@ public abstract class AbstractQueryRunner {
      */
     public void fillStatement(PreparedStatement preparedStatement, Object... params) throws SQLException {
 
-        if (params == null) {
-            return;
-        }
         checkParamCount(preparedStatement, params);
         for (int i = 0; i < params.length; i++) {
             fillStatement(preparedStatement, i + 1, params[i]);

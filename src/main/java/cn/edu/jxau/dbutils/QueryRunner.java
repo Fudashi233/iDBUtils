@@ -63,6 +63,7 @@ public class QueryRunner extends AbstractQueryRunner {
      */
     private int update(Connection connection, boolean closeConn, String sql, Object... params) throws SQLException {
 
+        params = params == null ? new Object[0] : params;
         check(connection, closeConn, sql);
         int result = 0;
         try {
@@ -114,6 +115,7 @@ public class QueryRunner extends AbstractQueryRunner {
 
     private <T> T query(Connection connection, boolean closeConn, String sql, ResultSetHandler<T> handler, Object... params) throws SQLException {
 
+        params = params == null ? new Object[0] : params;
         check(connection, closeConn, sql);
         if (handler == null) {
             if (closeConn) {
@@ -149,6 +151,7 @@ public class QueryRunner extends AbstractQueryRunner {
     //--------------------------------------
     // batch
     //--------------------------------------
+
 
     //--------------------------------------
     // insert
