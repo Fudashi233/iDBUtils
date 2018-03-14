@@ -39,6 +39,12 @@ public class Main {
     @Test
     public void test() throws SQLException {
 
+        int[][] matrix = new int[1][1];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                System.out.println(matrix[i][j]);
+            }
+        }
     }
 
     @Test
@@ -96,7 +102,7 @@ public class Main {
         QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
         String sql = "SELECT * FROM t_customer WHERE id = ?";
         Object params[] = {2};
-        Customer customer =  (Customer)qr.query(sql, params, new BeanHandler(Customer.class));
+        Customer customer = (Customer) qr.query(sql, params, new BeanHandler(Customer.class));
         System.out.println(customer);
     }
 

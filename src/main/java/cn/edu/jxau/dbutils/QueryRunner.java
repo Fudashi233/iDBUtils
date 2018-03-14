@@ -148,13 +148,23 @@ public class QueryRunner extends AbstractQueryRunner {
         }
         return result;
     }
+
     //--------------------------------------
     // batch
     //--------------------------------------
+    private int[] batch(Connection connection, boolean closeConn, String sql, Object[][] params) {
 
+        params = params == null?new Object[0][0] : params;
+        return null;
+    }
 
     //--------------------------------------
     // insert
+    //--------------------------------------
+
+
+    //--------------------------------------
+    // insertBatch
     //--------------------------------------
 
 }
