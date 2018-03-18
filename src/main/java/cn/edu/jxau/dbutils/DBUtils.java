@@ -214,7 +214,7 @@ public class DBUtils {
         message.append(cause == null ? "" : cause);
         message.append(" Query: ").append(sql).append("\n");
         message.append(" Parameters: ").
-                append(params == null ? "[]" : Arrays.toString(params)).append("\n");
+                append(params == null ? "[]" : Arrays.deepToString(params)).append("\n");
 
         SQLException e = new SQLException(message.toString(), cause.getSQLState(), cause.getErrorCode());
         e.setNextException(cause);

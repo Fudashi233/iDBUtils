@@ -1,5 +1,8 @@
 package cn.edu.jxau.dbutils;
 
+import cn.edu.jxau.dbutils.handlers.ColumnHandler;
+import cn.edu.jxau.dbutils.handlers.ResultSetHandler;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -152,16 +155,99 @@ public class QueryRunner extends AbstractQueryRunner {
     //--------------------------------------
     // batch
     //--------------------------------------
-    private int[] batch(Connection connection, boolean closeConn, String sql, Object[][] params) {
+    public int[] batch(Connection connection, String sql, Object[][] params) throws SQLException {
+        return batch(connection, false, sql, params);
+    }
 
-        params = params == null?new Object[0][0] : params;
-        return null;
+    public int[] batch(String sql, Object[][] params) throws SQLException {
+        return batch(DBUtils.getConnection(super.getDataSource()), true, sql, params);
+    }
+
+    private int[] batch(Connection connection, boolean closeConn, String sql, Object[][] params) throws SQLException {
+
+        check(connection, closeConn, sql);
+        if (params == null) {
+            if (closeConn) {
+                DBUtils.close(connection);
+            }
+            throw new SQLException("params is null");
+        }
+        int[] rows = null;
+        PreparedStatement statement = null;
+        try {
+            statement = DBUtils.prepareStatement(connection, sql);
+            for (int i = 0; i < params.length; i++) {
+                fillStatement(statement, params[i]);
+                statement.addBatch();
+                ;
+            }
+            rows = statement.executeBatch();
+        } catch (SQLException e) {
+            DBUtils.rethrow(e, sql, params);
+        } finally {
+            DBUtils.close(statement);
+            if (closeConn) {
+                DBUtils.close(connection);
+            }
+        }
+        return rows;
     }
 
     //--------------------------------------
     // insert
     //--------------------------------------
+    public <T> T insert(Connection connection, String sql, ColumnHandler<T> handler) throws SQLException {
+        return insert(connection, false, sql, handler, null);
+    }
 
+    public <T> T insert(Connection connection, String sql, ColumnHandler<T> handler, Object... params) throws SQLException {
+        return insert(connection, false, sql, handler, params);
+    }
+
+    public <T> T insert(String sql, ColumnHandler<T> handler) throws SQLException {
+        return insert(DBUtils.getConnection(super.getDataSource()), true, sql, handler, null);
+    }
+
+    public <T> T insert(String sql, ColumnHandler<T> handler, Object... params) throws SQLException {
+        return insert(DBUtils.getConnection(super.getDataSource()), true, sql, handler, params);
+    }
+
+    private <T> T insert(Connection connection, boolean closeConn, String sql, ResultSetHandler<T> handler, Object... params) throws SQLException {
+
+        params = params == null ? new Object[0] : params;
+        check(connection, closeConn, sql);
+        if (handler == null) {
+            if (closeConn) {
+                DBUtils.close(connection);
+            }
+            throw new IllegalArgumentException("handler is null");
+        }
+        PreparedStatement preStatement = null;
+        ResultSet resultSet = null;
+        T result = null;
+        try {
+            preStatement = DBUtils.prepareStatement(connection, sql, true);
+            super.fillStatement(preStatement, params);
+            preStatement.execute();
+            resultSet = preStatement.getGeneratedKeys();
+            result = handler.handle(resultSet);
+        } catch (SQLException e) {
+            DBUtils.rethrow(e, sql, params);
+        } finally {
+            try {
+                DBUtils.close(resultSet);
+            } finally {
+                try {
+                    DBUtils.close(preStatement);
+                } finally {
+                    if (closeConn) {
+                        DBUtils.close(connection);
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
     //--------------------------------------
     // insertBatch

@@ -1,4 +1,4 @@
-package cn.edu.jxau.dbutils;
+package cn.edu.jxau.dbutils.handlers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
