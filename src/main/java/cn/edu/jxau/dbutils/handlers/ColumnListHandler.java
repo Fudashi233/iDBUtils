@@ -20,6 +20,10 @@ public class ColumnListHandler<T> extends AbstractListHandler<T> {
     }
 
     public ColumnListHandler(int columnIndex) {
+
+        if (columnIndex < 1) {
+            throw new IllegalArgumentException("columnIndex 需要大于等于1");
+        }
         this.columnIndex = columnIndex;
     }
 

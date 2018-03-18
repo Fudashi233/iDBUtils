@@ -7,6 +7,7 @@ import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,12 +40,6 @@ public class Main {
     @Test
     public void test() throws SQLException {
 
-        int[][] matrix = new int[1][1];
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[0].length; j++) {
-                System.out.println(matrix[i][j]);
-            }
-        }
     }
 
     @Test
