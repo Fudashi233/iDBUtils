@@ -1,5 +1,7 @@
 package cn.edu.jxau.dbutils.handlers;
 
+import cn.edu.jxau.dbutils.ResultSetHandler;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;

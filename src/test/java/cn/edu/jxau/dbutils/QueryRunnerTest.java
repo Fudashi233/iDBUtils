@@ -2,6 +2,7 @@ package cn.edu.jxau.dbutils;
 
 import cn.edu.jxau.dbutils.handlers.BeanHandler;
 import cn.edu.jxau.dbutils.handlers.ColumnHandler;
+import cn.edu.jxau.dbutils.handlers.ColumnListHandler;
 import cn.edu.jxau.lang.Customer;
 import cn.edu.jxau.lang.JDBCUtils;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Desc:
@@ -66,5 +68,17 @@ public class QueryRunnerTest {
         Object[] params = {"name","contact","tel","email","remark","1996-09-20"};
         BigInteger i  = qr.insert(sql,new ColumnHandler<BigInteger>(), params);
         System.out.println(i);
+    }
+
+    @Test
+    public void insertBatch() throws SQLException {
+
+        QueryRunner qr = new QueryRunner(JDBCUtils.getDataSource());
+        String sql = "INSERT INTO t_customer VALUES(NULL,?,?,?,?,?,?)";
+        Object[][] params = {{"name","contact","tel","email","remark","1996-09-20"},
+                {"name","contact","tel","email","remark","1996-09-21"},
+                {"name","contact","tel","email","remark","1996-09-22"}};
+        List<BigInteger> list = qr.insertBatch(sql,new ColumnListHandler<BigInteger>(), params);
+        System.out.println(list);
     }
 }

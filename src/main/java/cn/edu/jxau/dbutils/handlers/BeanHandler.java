@@ -1,6 +1,7 @@
 package cn.edu.jxau.dbutils.handlers;
 
 import cn.edu.jxau.dbutils.BasicRowProcessor;
+import cn.edu.jxau.dbutils.ResultSetHandler;
 import cn.edu.jxau.dbutils.RowProcessor;
 
 import java.sql.ResultSet;

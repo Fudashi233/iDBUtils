@@ -1,13 +1,9 @@
 package cn.edu.jxau.dbutils;
 
 import cn.edu.jxau.dbutils.handlers.ColumnHandler;
-import cn.edu.jxau.dbutils.handlers.ResultSetHandler;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * Desc:
@@ -76,9 +72,7 @@ public class QueryRunner extends AbstractQueryRunner {
         } catch (SQLException e) {
             DBUtils.rethrow(e, sql, params);
         } finally {
-            if (closeConn) {
-                DBUtils.close(connection);
-            }
+            finallyClose(connection, closeConn, null, null);
         }
         return result;
     }
@@ -137,17 +131,7 @@ public class QueryRunner extends AbstractQueryRunner {
         } catch (SQLException e) {
             DBUtils.rethrow(e, sql, params);
         } finally {
-            try {
-                DBUtils.close(resultSet);
-            } finally {
-                try {
-                    DBUtils.close(preStatement);
-                } finally {
-                    if (closeConn) {
-                        DBUtils.close(connection);
-                    }
-                }
-            }
+            finallyClose(connection, closeConn, preStatement, null);
         }
         return result;
     }
@@ -173,22 +157,19 @@ public class QueryRunner extends AbstractQueryRunner {
             throw new SQLException("params is null");
         }
         int[] rows = null;
-        PreparedStatement statement = null;
+        PreparedStatement preStatement = null;
         try {
-            statement = DBUtils.prepareStatement(connection, sql);
+            preStatement = DBUtils.prepareStatement(connection, sql);
             for (int i = 0; i < params.length; i++) {
-                fillStatement(statement, params[i]);
-                statement.addBatch();
+                fillStatement(preStatement, params[i]);
+                preStatement.addBatch();
                 ;
             }
-            rows = statement.executeBatch();
+            rows = preStatement.executeBatch();
         } catch (SQLException e) {
             DBUtils.rethrow(e, sql, params);
         } finally {
-            DBUtils.close(statement);
-            if (closeConn) {
-                DBUtils.close(connection);
-            }
+            finallyClose(connection, closeConn, preStatement, null);
         }
         return rows;
     }
@@ -234,17 +215,7 @@ public class QueryRunner extends AbstractQueryRunner {
         } catch (SQLException e) {
             DBUtils.rethrow(e, sql, params);
         } finally {
-            try {
-                DBUtils.close(resultSet);
-            } finally {
-                try {
-                    DBUtils.close(preStatement);
-                } finally {
-                    if (closeConn) {
-                        DBUtils.close(connection);
-                    }
-                }
-            }
+            finallyClose(connection, closeConn, preStatement, resultSet);
         }
         return result;
     }
@@ -252,5 +223,55 @@ public class QueryRunner extends AbstractQueryRunner {
     //--------------------------------------
     // insertBatch
     //--------------------------------------
+    public <T> T insertBatch(Connection connection, String sql, ResultSetHandler<T> handler, Object[][] params) throws SQLException {
+        return insertBatch(connection, false, sql, handler, params);
+    }
 
+    public <T> T insertBatch(String sql, ResultSetHandler<T> handler, Object[][] params) throws SQLException {
+        return insertBatch(DBUtils.getConnection(super.getDataSource()), true, sql, handler, params);
+    }
+
+    private <T> T insertBatch(Connection conn, boolean closeConn, String sql, ResultSetHandler<T> handler, Object[][] params) throws SQLException {
+
+        check(conn, closeConn, sql);
+        if (params == null) {
+            if (closeConn) {
+                DBUtils.close(conn);
+            }
+            throw new IllegalArgumentException("params is null");
+        }
+        PreparedStatement preStatement = null;
+        ResultSet resultSet = null;
+        T result = null;
+        try {
+            preStatement = DBUtils.prepareStatement(conn, sql, true);
+            for(int i=0;i<params.length;i++) {
+                super.fillStatement(preStatement,params[i]);
+                preStatement.addBatch();
+            }
+            preStatement.executeBatch();
+            resultSet = preStatement.getGeneratedKeys();
+            result = handler.handle(resultSet);
+        } catch (SQLException e) {
+            DBUtils.rethrow(e, sql, params);
+        } finally {
+            finallyClose(conn, closeConn, preStatement, resultSet);
+        }
+        return result;
+    }
+
+    private void finallyClose(Connection conn, boolean closeConn, Statement statement, ResultSet resultSet) throws SQLException {
+
+        try {
+            DBUtils.close(resultSet);
+        } finally {
+            try {
+                DBUtils.close(statement);
+            } finally {
+                if (closeConn) {
+                    DBUtils.close(conn);
+                }
+            }
+        }
+    }
 }

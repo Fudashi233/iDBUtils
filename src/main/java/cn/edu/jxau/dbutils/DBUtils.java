@@ -186,10 +186,7 @@ public class DBUtils {
 
     public static PreparedStatement prepareStatement(Connection conn, String sql) throws SQLException {
 
-        if (sql == null || sql.isEmpty()) {
-            throw new IllegalArgumentException("参数异常，sql is null or empty");
-        }
-        return conn.prepareStatement(sql);
+        return prepareStatement(conn,sql,false);
     }
 
     /**
@@ -201,6 +198,9 @@ public class DBUtils {
      */
     public static PreparedStatement prepareStatement(Connection conn, String sql, boolean returnPK) throws SQLException {
 
+        if (sql == null || sql.isEmpty()) {
+            throw new IllegalArgumentException("参数异常，sql is null or empty");
+        }
         if (returnPK) {
             return conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         } else {
