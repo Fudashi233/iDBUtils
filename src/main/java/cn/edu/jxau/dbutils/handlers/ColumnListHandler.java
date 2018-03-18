@@ -10,7 +10,7 @@ import java.sql.SQLException;
  * Date:2018/3/18
  * Time:上午11:36
  */
-public class ColumnListHandler<T> implements ResultSetHandler<T> {
+public class ColumnListHandler<T> extends AbstractListHandler<T> {
 
     private int columnIndex;
     private String columnName;
@@ -25,22 +25,20 @@ public class ColumnListHandler<T> implements ResultSetHandler<T> {
 
     public ColumnListHandler(String columnName) {
 
-        if(columnName == null || columnName.isEmpty()) {
+        if (columnName == null || columnName.isEmpty()) {
             throw new IllegalArgumentException("columnName is null or empty");
         }
         this.columnName = columnName;
     }
 
-    @Override
-    public T handle(ResultSet resultSet) throws SQLException {
 
-        while(resultSet.next()) {
-            if(columnName != null) {
-                return (T) resultSet.getObject(columnName);
-            } else {
-                return (T) resultSet.getObject(columnIndex);
-            }
+    @Override
+    protected T handleRow(ResultSet resultSet) throws SQLException {
+
+        if (columnName != null) {
+            return (T) resultSet.getObject(columnName);
+        } else {
+            return (T) resultSet.getObject(columnIndex);
         }
-        return null;
     }
 }
